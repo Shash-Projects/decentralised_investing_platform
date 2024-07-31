@@ -21,6 +21,7 @@ contract Dao{
     constructor(uint256 _noOfExperts, uint256 _minAcceptanceToPassProposal, uint256 _stakeAmount){
 
         owner = msg.sender;
+        panelOfExperts.push(owner);
         noOfExperts = _noOfExperts;
         minAcceptanceToPassProposal = _minAcceptanceToPassProposal;
         minStake = _stakeAmount;
@@ -50,18 +51,18 @@ contract Dao{
 
     // Only experts can propose for an investment
     modifier checkAccess{
-        bool memory access;
+        bool access= false;
         for(uint i=0; i<panelOfExperts.length; i++){
             if(panelOfExperts[i]== msg.sender){
                 access= true;
             }
         }
-        require(access, " Only an expert can make a proposal. ")
+        require(access, " Only an expert can make a proposal. ");
         _;
     }
 
     Proposal[] public proposals;
-    mapping(uint256 => mapping(address => bool)) public proposalVotes;
+    mapping(uint256 => mapping(address => bool)) public proposalVotes; // marks whether voted already or not
 
     // does not force the user to stake the entire amount at one go
     function stake() public payable{
@@ -91,7 +92,7 @@ contract Dao{
         emit expertAddedToPanel(panelOfExperts.length-1, msg.sender);
     }
 
-    function makeProposal(address _target, bytes _data, uint _amountToInvest, uint _marginForStakers, uint _marginForPublic, uint _expiryHr) public checkAccess{
+    function makeProposal(address _target, bytes calldata _data, uint _amountToInvest, uint _marginForStakers, uint _marginForPublic, uint _expiryHr) public checkAccess{
         Proposal storage prop = proposals.push(); //returns a reference to the newly added struct. 
         prop.target = _target;
         prop.data = _data;
@@ -111,10 +112,10 @@ contract Dao{
             return;
         }
         if(vote){
-            yesCount++;
+            proposals[index].yesCount++;
             proposalVotes[index][msg.sender] = true;
         }else{
-            noCount++;
+            proposals[index].noCount++;
             proposalVotes[index][msg.sender] = true;
         }
 
