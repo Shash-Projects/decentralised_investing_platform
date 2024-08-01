@@ -56,7 +56,7 @@ contract Dao{
                 access= true;
             }
         }
-        require(access, " Only an expert can make a proposal. ")
+        require(access, " Only an expert can make a proposal. ");
         _;
     }
 

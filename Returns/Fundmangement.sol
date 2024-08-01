@@ -2,9 +2,10 @@
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "../dao/contracts/Dao.sol";
 
 
-contract Returns is Ownable{
+contract Returns is Ownable , Dao{
     mapping(address => uint) public balances;
     mapping(address => uint) public invested;
     address[] public investors;
