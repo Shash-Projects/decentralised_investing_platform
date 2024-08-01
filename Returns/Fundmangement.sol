@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "./tests.sol" ; 
+import "@openzeppelin/contracts/access/Ownable.sol"; 
 
 contract Returns is Ownable , fakeData{
     mapping(address => uint) public invested;  // no. of tokens bought by investor
