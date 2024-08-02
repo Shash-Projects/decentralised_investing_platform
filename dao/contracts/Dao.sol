@@ -66,6 +66,7 @@ contract Dao{
 
     // does not force the user to stake the entire amount at one go
     function stake() public payable{
+        require(panelOfExperts.length <= noOfExperts, " Expert positions filled ");
         require(msg.value > 0, " Amount ransferred must not be 0");
         stakes[msg.sender] += msg.value;
 
@@ -92,7 +93,7 @@ contract Dao{
         emit expertAddedToPanel(panelOfExperts.length-1, msg.sender);
     }
 
-    function makeProposal(address _target, bytes calldata _data, uint _amountToInvest, uint _marginForStakers, uint _marginForPublic, uint _expiryHr) public checkAccess{
+    function makeProposal(address payable _target, bytes calldata _data, uint _amountToInvest, uint _marginForStakers, uint _marginForPublic, uint _expiryHr) public checkAccess{
         Proposal storage prop = proposals.push(); //returns a reference to the newly added struct. 
         prop.target = _target;
         prop.data = _data;
@@ -105,12 +106,17 @@ contract Dao{
     }
     
     function voteForProposal(bool vote, uint index) public checkAccess{
+        // checking whether it has expired or not 
         if(block.timestamp > proposals[index].expiry){ 
             emit proposalExpired(index);
             return; }
+
+        // Whether already voted on the proposal    
         if(proposalVotes[index][msg.sender] == true){
             return;
         }
+
+        // fresh vote
         if(vote){
             proposals[index].yesCount++;
             proposalVotes[index][msg.sender] = true;
@@ -122,9 +128,9 @@ contract Dao{
         emit votedSuccessfully(vote, msg.sender);
 
         if(proposals[index].yesCount >= minAcceptanceToPassProposal && !proposals[index].executed){
-            (bool s,) = proposals[index].target.call(proposals[index].data);
-            require(s, " Proposal did not execute ");
-            proposals[index].executed = true;
+            // (bool s,) = proposals[index].target.call(proposals[index].data);
+            // require(s, " Proposal did not execute ");
+            // proposals[index].executed = true;
         }
     }
 
