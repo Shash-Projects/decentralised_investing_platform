@@ -2,9 +2,12 @@
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./tests.sol" ; 
+import "./Dao.sol";
 
-contract Returns is Ownable , fakeData{
+
+
+
+contract Returns is Ownable , Dao {
     mapping(address => uint) public invested;  // no. of tokens bought by investor
     address[] public investors; // array of addresses of investors
     address public Proposer ; 
