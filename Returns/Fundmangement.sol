@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol"; 
 
-contract Returns is Ownable , fakeData{
+contract Returns is Ownable {
     mapping(address => uint) public invested;  // no. of tokens bought by investor
     address[] public investors; // array of addresses of investors
     address public Proposer ; 
