@@ -5,47 +5,55 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "../dao/contracts/Dao.sol";
 
 
-contract Returns is Ownable , Dao{
-    mapping(address => uint) public balances;
-    mapping(address => uint) public invested;
-    address[] public investors;
+
+
+contract Returns is Ownable , Dao {
+    mapping(address => uint) public invested;  // no. of tokens bought by investor
+    address[] public investors; // array of addresses of investors
     address public Proposer ; 
-    uint public ProfitShare ; 
-    uint public totalInvested;
-    uint public profits;
+    uint public ProfitShare ; // share of the experts 
+    uint public experts  ;  // no. of experts
+    uint tokenprice    ; 
+    uint public totalInvested;  // total investment money
+    uint public profits = totalInvested; // money returned after investment 
 
     constructor(address initialOwner) Ownable(initialOwner) {
         transferOwnership(initialOwner);
             }
 
-    function invest() external payable {
-        require(msg.value > 0, "Investment must be greater than zero");
-        if (balances[msg.sender] == 0) {
-            investors.push(msg.sender);
-        }
-        balances[msg.sender] += msg.value;
-        invested[msg.sender] += msg.value;
-        totalInvested += msg.value;
-    }
+// this function generates a random no. b/w 10 to 100 , which will be used as profit rate 
+function randomNum() public  {
+    uint random = uint(keccak256(abi.encodePacked(block.difficulty , block.timestamp , msg.sender))) ; 
+    return (random%91 + 10 ) ;
+}
+
+
+function investment() public returns (uint _profits) {
+        require(totalInvested > 0, "No investments made");
+        uint profitRate = randomNum() ; 
+    profits += totalInvested*(profitRate / 100);
+}
+
+
 
     function distribution() external onlyOwner {
-        require(totalInvested > 0, "No investments made");
-
+require (investors.length > 0 , "No investors "); 
+require (experts > 0 , "No experts"); 
         uint totalProfit = profits - totalInvested;
-        uint proposerShare = (totalProfit * ProfitShare) / 100;
+        uint proposerShare = (totalProfit * (ProfitShare / 100)) / experts;
 
-        // Ensure proposer's share does not exceed the limit such that remaining profit is greater than totalInvested
-        require(totalProfit - proposerShare > totalInvested, "Proposer's share is too high");
 
-        uint remainingProfit = totalProfit - proposerShare;
+
+        uint buyers = (totalProfit - proposerShare) / investors.length;
+        // uint buyer = buyers*invested[]
         
         payable(Proposer).transfer(proposerShare);
 
         for (uint i = 0; i < investors.length; i++) {
             address investor = investors[i];
-            uint investment = invested[investor];
-            uint share = (remainingProfit * investment) / totalInvested;
-            payable(investor).transfer(share);
+            uint investment = invested[investor]; //  token balance of the investor 
+            uint share = (buyers* investment) ;
+            payable(investor).transfer(share + (investment*tokenprice));
         }
     }
 
