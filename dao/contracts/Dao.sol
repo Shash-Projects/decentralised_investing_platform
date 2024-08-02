@@ -37,7 +37,6 @@ contract Dao{
         uint256 marginForPublic;
         uint256 expiry;
         bool executed;
-        bytes data;
         // mapping(address => bool) hasVoted;  not use mapping inside structs
         
 
