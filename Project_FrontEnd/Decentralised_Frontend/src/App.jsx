@@ -1,20 +1,20 @@
-import { useState } from 'react'
-import './App.css'
-import Navbar from './Navbar'
-import Hero from './Hero'
-import ProposerInvestorCards from './Cards'
-
-
+import {useState, useEffect} from 'react';
+import { ethers } from 'ethers'
+import { useAuth } from './AuthContext';
+import './App.css';
+import Navbar from './components/Navbar';
+import Hero from  './components/Hero';
+import ProposerInvestorCards from './components/Cards';
 
 
 function App() {
-
+  const { provider, account, isConnected, connectToMetamask } = useAuth();
 
   return (
     <>
     <Navbar/>
-    <Hero/>
-    <ProposerInvestorCards/>
+    <Hero status={account} connectWallet= {connectToMetamask} />
+    <ProposerInvestorCards status={isConnected}/>
     </>
   )
 }
